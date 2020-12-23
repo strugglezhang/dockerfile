@@ -1,0 +1,136 @@
+version: "3"
+
+services :
+    # golang :
+    #     container_name : zc-go
+    #     image : golang
+    #     ports :
+    #         - "82:82"
+    #     networks:
+    #         - "default"
+    #     restart: always
+    #     tty: true
+    php-fpm :
+        container_name : zc-fpm
+        build:
+            context: .
+            dockerfile: ./dockerfiles/php/Dockerfile
+        ports :
+            - "9000:9000"
+        networks:
+            - "default"
+        restart: always
+        volumes:
+            - "~/work:/home"
+    redis :
+        container_name : zc-redis
+        image : redis
+        ports :
+            - "6379:6379"
+        networks:
+            - "default"
+        restart: always
+    nginx :
+        container_name : zc-nginx
+        image : nginx
+        ports :
+            - "80:80"
+            - "81:81"
+        networks:
+            - "default"
+        restart: always
+        volumes:
+            - "~/docker/dev/conf/nginx:/etc/nginx/"
+            - "~/work:/data/works"
+        depends_on:
+            - "php-fpm"
+    mysql :
+        container_name : zc-mysql
+        image : mysql
+        ports :
+            - "3306:3306"
+        env_file :
+            - "./env/mysql.env"
+        networks:
+            - "default"
+        environment:
+            MYSQL_ROOT_PASSWORD: 123456
+        restart: always
+        volumes:
+            - "~/docker/dev/conf/mysql:/etc/mysql"
+    grafana :
+        container_name : zc-grafana
+        image: grafana/grafana
+        ports: 
+            - "3000:3000"
+        networks:
+            - "default"
+    es :
+        container_name : zc-es 
+        build:
+            context: .
+            dockerfile: ./dockerfiles/es/Dockerfile
+        ports: 
+            - "9200:9200"
+            - "9300:9300"
+        networks:
+            - "default"
+        environment :
+            discovery.type : "single-node"
+        volumes:
+            - "~/docker/dev/conf/es:/usr/share/elasticsearch/config"
+    logstash :
+        container_name : zc-logstash
+        build:
+            context: .
+            dockerfile: ./dockerfiles/logstash/Dockerfile
+        ports: 
+            - "5044:5044"
+        networks:
+            - "default"
+        volumes:
+            - "~/docker/dev/conf/logstash:/usr/share/logstash/config"
+            - "~/work/grow/kubernetes/log/biz-growth-k8s:/home/work"
+    kibana :
+        container_name : zc-kibana 
+        image : docker.elastic.co/kibana/kibana:6.8.13@sha256:fe5d181d7fa0523005538c986215aa9fe31e88712828194bc0d13a8f3a5c4714
+        ports: 
+            - "5601:5601"
+        environment :
+            ELASTICSEARCH_URL : "http://zc-es:9200"
+        depends_on:
+            - "es"
+            - "logstash"
+        networks:
+            - "default"
+    zk :
+        container_name : zc-zk
+        image  : wurstmeister/zookeeper
+        ports: 
+            - "2181:2181"
+        networks:
+            - "default"
+    kafka :
+        container_name : zc-kafka
+        image : wurstmeister/kafka
+        ports: 
+            - "9092:9092"
+        networks:
+            - "default"
+        environment :
+            KAFKA_ZOOKEEPER_CONNECT : "zc-zk"
+            KAFKA_ADVERTISED_HOST_NAME : "zc-kafka"
+            KAFKA_ADVERTISED_PORT : 9092
+        depends_on:
+            - "zk"    
+    esheader :
+        container_name: zc-esheader
+        image : mobz/elasticsearch-head:5
+        ports: 
+            - "9400:9100"
+        networks:
+            - "default"
+        depends_on:
+            - "es" 
+networks:
+    default:

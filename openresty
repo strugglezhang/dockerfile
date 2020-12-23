@@ -1,0 +1,18 @@
+./configure --sbin-path=/Users/bigstick/soft/nginx/sbin   \
+--conf-path=/Users/bigstick/soft/nginx/conf/nginx.conf \
+--with-openssl=/Users/bigstick/soft/openssl \
+--error-log-path=/Users/bigstick/soft/nginx/logs/error.log \
+--pid-path=/Users/bigstick/soft/nginx/logs/nginx.pid  \
+--user=www \
+--group=www \
+--with-http_v2_module \
+--with-http_ssl_module \
+--with-http_gzip_static_module \
+--with-http_realip_module \
+--with-http_flv_module \
+--with-pcre-jit  \
+--prefix=/Users/bigstick/soft \
+--with-http_sub_module  \
+--with-http_gunzip_module \
+--http-log-path=/Users/bigstick/soft/nginx/logs \
+--modules-path=/Users/bigstick/soft/nginx/modules
