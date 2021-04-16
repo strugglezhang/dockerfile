@@ -31,7 +31,7 @@ services :
             - "default"
         restart: always
         volumes:
-            - "~/docker/dev/conf/nginx:/etc/nginx/"
+            - "~/docker/conf/nginx:/etc/nginx/"
             - "~/work:/data/works"
         depends_on:
             - "php-fpm"
@@ -47,8 +47,9 @@ services :
         environment:
             MYSQL_ROOT_PASSWORD: 123456
         restart: always
+        command: --default-authentication-plugin=mysql_native_password
         volumes:
-            - "~/docker/dev/conf/mysql:/etc/mysql"
+            - "~/docker/conf/mysql:/etc/mysql"
     grafana :
         container_name : zc-grafana
         image: grafana/grafana
@@ -69,7 +70,7 @@ services :
         environment :
             discovery.type : "single-node"
         volumes:
-            - "~/docker/dev/conf/es:/usr/share/elasticsearch/config"
+            - "~/docker/conf/es:/usr/share/elasticsearch/config"
     logstash :
         container_name : zc-logstash
         build:
@@ -80,7 +81,7 @@ services :
         networks:
             - "default"
         volumes:
-            - "~/docker/dev/conf/logstash:/usr/share/logstash/config"
+            - "~/docker/conf/logstash:/usr/share/logstash/config"
             - "~/work/grow/kubernetes/log/biz-growth-k8s:/home/work"
     kibana :
         container_name : zc-kibana
