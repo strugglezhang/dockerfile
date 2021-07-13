@@ -6,16 +6,23 @@ RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php-cli.ini
 RUN pear config-set php_ini /usr/local/etc/php/php-cli.ini
 
 
+ADD ["./.composer/","/tmp/"]
+
 RUN apk add make \
     && apk add gcc musl-dev g++ zlib-dev \
     && apk add libmemcached-dev \
     && apk add autoconf \
     && pecl install memcached \
     && pecl install redis \
-    && docker-php-ext-install pdo \
+    && apk add libpng \
+    && apk add libpng-dev \
+    && apk add libjpeg-turbo \
+    && apk add libjpeg-turbo-dev \
+    && docker-php-ext-install gd \
     && docker-php-ext-install sockets \
     && docker-php-ext-install pdo_mysql \
     && docker-php-ext-install bcmath \
+    && docker-php-ext-install pdo\
     && docker-php-ext-install mysqli \
     && pecl install swoole \
     && apk add --no-cache rabbitmq-c \
